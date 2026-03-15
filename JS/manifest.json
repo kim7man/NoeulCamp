@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Interpark Camping Booking Macro",
+  "description": "인터파크 노을캠핑장 자동 예약 매크로",
+  "version": "1.0.0",
+  "host_permissions": [
+    "https://ticket.interpark.com/"
+  ],
+  "icons": {
+      "128": "images/icon128.png"
+  },
+  "content_scripts": [ {
+    "all_frames": true,
+    "js": ["jquery-3.7.0.min.js", "content.js"],
+    "matches": ["https://ticket.interpark.com/*", "https://poticket.interpark.com/*"],
+    "run_at": "document_idle"
+  }],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+  {
+    "resources": ["injectedScript.js", "jquery-3.7.0.min.js", "images/*", "assets/*"],
+    "matches": ["https://*.interpark.com/*"]
+  }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  }
+}
