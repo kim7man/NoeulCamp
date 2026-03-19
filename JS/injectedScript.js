@@ -21,12 +21,12 @@ const calendarObserver = new MutationObserver((mutations) => {
 		var dayTags = document.querySelectorAll('#BookingDateTime a');
 		var targetImgTags = [];
 
-		var targetSS = sessionStorage.getItem("targetDD");
+		var targetDD = sessionStorage.getItem("targetDD");
 		dayTags.forEach(function(dayTag) {
 //			if (dayTag.getAttribute('class') && dayTag.getAttribute('class').includes('selOn')) {
 //				targetImgTags.push(dayTag);
 //			}
-			if (dayTag.text.split('(')[0] == targetSS)
+			if (dayTag.text.split('(')[0] == targetDD)
 			{
 				targetImgTags.push(dayTag);
 			}
@@ -44,32 +44,37 @@ const calendarObserver = new MutationObserver((mutations) => {
 			stat = 'length';
 			targetImgTags[0].click();
 		}
+		else
+		{
+			console.log('해당 날짜는 예약할 수 없습니다. 변경 후 다시 시작해주세요.');
+		}
 		
 		}
 		else if(stat == 'length')
 		{
-	siteStatusObserver.observe(document.querySelector("#SeatRemainNotice"), {
-		// 변경을 감지할 요소를 지정합니다.
-		subtree: true,
-		// 변경의 종류를 지정합니다.
-		attributes: true,
-		childList: true,
-		characterData: true,
-	});
+			console.log('이용기간 선택');
+			siteStatusObserver.observe(document.querySelector("#SeatRemainNotice"), {
+				// 변경을 감지할 요소를 지정합니다.
+				subtree: true,
+				// 변경의 종류를 지정합니다.
+				attributes: true,
+				childList: true,
+				characterData: true,
+			});
 
-	var targetNN = sessionStorage.getItem("targetNN");
-	if (targetNN == 1)
-	{//1박 선택
-		sfnClickNights = "fnCheckInSelect('"+jQuery('#SelectCheckIn')[0].options[1].value+"');";
-		jQuery("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
-		jQuery("#ClickNights")[0].click();
-	}
-	else
-	{//2박 선택 
-		sfnClickNights = "fnCheckInSelect('"+jQuery('#SelectCheckIn')[0].options[2].value+"');";
-		jQuery("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
-		jQuery("#ClickNights")[0].click();
-	}
+			var targetNN = sessionStorage.getItem("targetNN");
+			if (targetNN == 1)
+			{//1박 선택
+				sfnClickNights = "fnCheckInSelect('"+j$('#SelectCheckIn')[0].options[1].value+"');";
+				j$("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
+				j$("#ClickNights")[0].click();
+			}
+			else
+			{//2박 선택 
+				sfnClickNights = "fnCheckInSelect('"+j$('#SelectCheckIn')[0].options[2].value+"');";
+				j$("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
+				j$("#ClickNights")[0].click();
+			}
 
 		}
 
@@ -107,7 +112,7 @@ const iframeObserver = new MutationObserver((mutations) => {
 //
 //	timeout = setTimeout(function(){
 //		console.log(mutations);
-//		btns = jQuery('#btn_Default a');
+//		btns = j$('#btn_Default a');
 //		console.log(btns);
 //		btns[1].click();
 //		iframeStepObserver.disconnect();
@@ -120,30 +125,34 @@ const iframeObserver = new MutationObserver((mutations) => {
 
 
 
-
 var intTimer = null;
 var count = 0;
 // 뷰모델이 적용 완료되었는지 확인하는 함수
 function pageReady() {
+
+	window.CaptchaYN = 'N';
+	clearCaptchaLayer();
+
 	// macro start 버튼 확인
 	if (statMacro)
 	{
 		clearInterval(intTimer);
-//		console.log("macroStart");
+		setTimeout(function(){
+			console.log("macroStart");
+			calendarObserver.observe(document.querySelector("#BookingDateTime"), {
+				// 변경을 감지할 요소를 지정합니다.
+				subtree: true,
+				// 변경의 종류를 지정합니다.
+				attributes: true,
+				childList: true,
+				characterData: true,
+			});
 
-		calendarObserver.observe(document.querySelector("#BookingDateTime"), {
-			// 변경을 감지할 요소를 지정합니다.
-			subtree: true,
-			// 변경의 종류를 지정합니다.
-			attributes: true,
-			childList: true,
-			characterData: true,
-		});
+			j$('#ClickMon')[0].click();
 
-		jQuery('#ClickMon')[0].click();
-
-		// 원하는 날짜 클릭
-		clickDay();
+			// 원하는 날짜 클릭
+			clickDay();
+		},500);
 	}
 	else
 	{
@@ -157,19 +166,47 @@ function pageReady() {
 }
 
 
+function clearCaptchaLayer() {
+	if (j$('div.captchSliderLayer')[0].style.display != 'none')
+	{
+		j$('div.captchSliderLayer')[0].style.display = 'none';
+	}
+	if (j$('#divRecaptchaWrap')[0].style.display != 'none')
+	{
+		j$('#divRecaptchaWrap')[0].style.display = 'none';
+	}
+	if (j$('#divRecaptcha')[0].style.display != 'none')
+	{
+		j$('#divRecaptcha')[0].style.display = 'none';
+	}
+}
+
+
+var trial = 0;
 function clickDay()
 {
-	var targetDD = sessionStorage.getItem("targetDD");
-	strDD = targetDD;
-	console.log(strDD);
-	sfnClickDay =  jQuery('a:contains("' + strDD + '")');
-	if(sfnClickDay.length)
+	if (trial==0)
 	{
-		sfnClickDay[0].click();
+		j$('#ClickMon')[0].click();
 	}
 	else
 	{
-		console.log('Select a day');
+	var targetDD = sessionStorage.getItem("targetDD");
+	strDD = targetDD;
+	console.log(strDD);
+	setTimeout(function(){
+		sfnClickDay =  j$('a:contains("' + strDD + '")');
+		console.log(sfnClickDay.length);
+		if(sfnClickDay.length)
+		{
+			console.log('click the date');
+			sfnClickDay[0].click();
+		}
+		else
+		{
+			console.log('Select a date');
+		}
+	}, 100);
 	}
 }
 
@@ -188,123 +225,216 @@ function clickLength()
 	var targetNN = sessionStorage.getItem("targetNN");
 	if (targetNN == 1)
 	{//1박 선택
-		sfnClickNights = "fnCheckInSelect('"+jQuery('#SelectCheckIn')[0].options[1].value+"');";
-		jQuery("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
-//		jQuery("#ClickNights")[0].click();
+		sfnClickNights = "fnCheckInSelect('"+j$('#SelectCheckIn')[0].options[1].value+"');";
+		j$("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
+//		j$("#ClickNights")[0].click();
 	}
 	else
 	{//2박 선택 
-		sfnClickNights = "fnCheckInSelect('"+jQuery('#SelectCheckIn')[0].options[2].value+"');";
-		jQuery("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
-		jQuery("#ClickNights")[0].click();
+		sfnClickNights = "fnCheckInSelect('"+j$('#SelectCheckIn')[0].options[2].value+"');";
+		j$("div#divMacro").append('<a id="ClickNights" href="javascript:' + sfnClickNights + ';"> N</a>');
+		j$("#ClickNights")[0].click();
 	}
 }
 
 function clickArea()
 {
-	iframeObserver.observe(document.querySelector("#ifrmSeat").contentWindow.document, {
-		// 변경을 감지할 요소를 지정합니다.
-		subtree: true,
-		// 변경의 종류를 지정합니다.
-		attributes: true,
-		childList: true,
-		characterData: true,
-	});
-
-
 	var targetBB = sessionStorage.getItem("targetBB");
-
-	var siteNum = targetBB.charCodeAt(0) - 'A'.charCodeAt(0)+1;
-	if (siteNum == 4)
-	{
-		siteNum = 0;
-	}
-
-	var iframe = document.getElementById('ifrmSeat');
-	var iframeDocument = iframe.contentWindow.document;
-	var areaTag = iframeDocument.querySelectorAll('area');
-	var clickEvent = new MouseEvent('click', {
-		view: window,
-		bubbles: true,
-		cancelable: true
-	});
-	
-	if(areaTag)
-	{
-		areaTag[siteNum].dispatchEvent(clickEvent);
-	}
-	else
-	{
-		console.log('The site is already out.');
-	}
-}
-
-function clickSite()
-{
 	var targetSS = sessionStorage.getItem("targetSS");
 
-	var btnNextStep = document.getElementsByClassName('btn_next_step');
-	console.log(btnNextStep);
+	var siteNum = targetBB.charCodeAt(0) - 'A'.charCodeAt(0)+1;
+//	if (siteNum == 4)
+//	{
+//		siteNum = 0;
+//	}
 
-	document.getElementById('ifrmSeat').onload = function() {
+	setTimeout(function(){
 		var iframe = document.getElementById('ifrmSeat');
 		var iframeDocument = iframe.contentWindow.document;
-		var mapDiv = iframeDocument.getElementById('map');
-		var imgTags = mapDiv.querySelectorAll('img');
-		var targetImgTags = [];
-
-		imgTags.forEach(function(imgTag) {
-			if (imgTag.getAttribute('title') && imgTag.getAttribute('title').includes(targetSS)) {
-				targetImgTags.push(imgTag);
-			}
+		var areaTag = iframeDocument.querySelectorAll('area');
+		var clickEvent = new MouseEvent('click', {
+			view: window,
+			bubbles: true,
+			cancelable: true
 		});
-		targetImgTags[0].click();
+		
+		console.log(areaTag);
+		if(areaTag)
+		{
+			areaTag[0].onmouseover();
 
-		var btnNextStep = iframeDocument.getElementsByClassName('btn_next_step');
-		btnNextStep[0].click();
 
-	}
+			// 사이트 번호가 0이하이면 빈자리 탐색 모드, 1이상이면 고정자리 선택모드
+			if(targetSS == '0')
+			{
+				timerInt = setInterval(function(){
+					j$('a.btn_map')[0].click();
 
+					iframe = document.getElementById('ifrmSeat');
+					iframeDocument = iframe.contentWindow.document;
+					areaTag = iframeDocument.querySelectorAll('area');
+
+					areaTag.forEach(function(tag) {
+						tag.onmouseover();
+						const [areaCode, remainingSeats] = tag.alt.match(/\d+/g) || [];
+						console.log(areaCode, remainingSeats);
+						if(areaCode && (areaCode == '005' || areaCode == '006')){
+							return;
+						}
+						if(remainingSeats && remainingSeats != '0'){
+							clearInterval(timerInt);
+							console.log('탐색모드');
+
+							iframeObserver.observe(document.querySelector("#ifrmSeat").contentWindow.document, {
+								// 변경을 감지할 요소를 지정합니다.
+								subtree: true,
+								// 변경의 종류를 지정합니다.
+								attributes: true,
+								childList: true,
+								characterData: true,
+							});
+
+							// 탐색모드 코드 삽입
+							stateMode = 0;
+							tag.dispatchEvent(clickEvent);
+							return;
+						}
+					});
+				}, 1000);
+			}
+			else
+			{
+				areaTag.forEach(function(tag) {
+					const [areaCode, remainingSeats] = tag.alt.match(/\d+/g) || [];
+					if(areaCode && areaCode == siteNum){
+
+						iframeObserver.observe(document.querySelector("#ifrmSeat").contentWindow.document, {
+							// 변경을 감지할 요소를 지정합니다.
+							subtree: true,
+							// 변경의 종류를 지정합니다.
+							attributes: true,
+							childList: true,
+							characterData: true,
+						});
+
+						console.log(areaCode, remainingSeats);
+						console.log('고정좌석모드');
+						// 고정좌석모드 코드 삽입
+						stateMode = 1;
+						tag.dispatchEvent(clickEvent);
+						return;
+					}
+				});
+			}
+		}
+	}, 100);
+}
+
+var stateMode = 0;
+
+function payment_process()
+{
 	sessionStorage.setItem('stepStatus', 'next');
 	document.getElementById('ifrmBookStep').onload = function() {
-
 		stepStatus = sessionStorage.getItem('stepStatus');
 		var iframeStep = document.getElementById('ifrmBookStep');
 		var iframeStepDocument = iframeStep.contentWindow.document;
 
 		if (stepStatus == 'next')
 		{
+			console.log('check detail');
 			sessionStorage.setItem('stepStatus', 'price');
 			btns=iframeStepDocument.querySelectorAll('#btn_Default a');
-			console.log(btns);
+//			console.log(btns);
 			btns[1].click();
 		}
 		else if(stepStatus == 'price')
 		{
+			console.log('payment info');
 			sessionStorage.setItem('stepStatus', 'info');
-			birthday = jQuery('#ifrmBookStep').contents().find('input[id="YYMMDD"]');
+			birthday = j$('#ifrmBookStep').contents().find('input[id="YYMMDD"]');
 			birthday.val('860213');
-			payment = jQuery('#ifrmBookStep').contents().find('#Payment_22004 [value="22004"]');
-			console.log(payment);
+			payment = j$('#ifrmBookStep').contents().find('#Payment_22004 [value="22004"]');
+//			console.log(payment);
 			payment.click();
-			bankname = jQuery('#ifrmBookStep').contents().find('#BankCode [value="38054"]'); //우리은행
+			bankname = j$('#ifrmBookStep').contents().find('#BankCode [value="38054"]'); //우리은행
 			bankname.attr("selected", true);
 
-			nextStep = jQuery('#ifrmBookStep').contents().find('img[id="NextStepImage"]');
+			nextStep = j$('#ifrmBookStep').contents().find('img[id="NextStepImage"]');
 			nextStep.click();
 		}
 		else if(stepStatus == 'info')
 		{
+			console.log('last check');
 			sessionStorage.setItem('stepStatus', 'agree');
-			cancelagree = jQuery('#ifrmBookStep').contents().find('input[id="CancelAgree"]');
+			cancelagree = j$('#ifrmBookStep').contents().find('input[id="CancelAgree"]');
 			cancelagree.prop("checked", true);
-			thirdperson = jQuery('#ifrmBookStep').contents().find('input[id="CancelAgree2"]');
+			thirdperson = j$('#ifrmBookStep').contents().find('input[id="CancelAgree2"]');
 			thirdperson.prop("checked", true);
 
-			nextStep = jQuery('#ifrmBookStep').contents().find('img[id="NextStepImage"]');
+			nextStep = j$('#ifrmBookStep').contents().find('img[id="NextStepImage"]');
 			nextStep.click(); // 최종 신청
 		}
+	}
 
+}
+
+function clickSite()
+{
+	if(stateMode)
+	{
+		var targetSS = sessionStorage.getItem("targetSS");
+
+		var btnNextStep = document.getElementsByClassName('btn_next_step');
+		console.log(btnNextStep);
+
+		document.getElementById('ifrmSeat').onload = function() {
+			var iframe = document.getElementById('ifrmSeat');
+			var iframeDocument = iframe.contentWindow.document;
+			var mapDiv = iframeDocument.getElementById('map');
+			var imgTags = mapDiv.querySelectorAll('img');
+			var targetImgTags = [];
+
+			imgTags.forEach(function(imgTag) {
+				if (imgTag.getAttribute('title') && imgTag.getAttribute('title').includes(targetSS)) {
+					targetImgTags.push(imgTag);
+				}
+			});
+			if (targetImgTags.length)
+			{
+				targetImgTags[0].click();
+			}
+			else{
+				console.log('해당 좌석이 이미 선택돼있습니다. 다른 자리로 다시 시도해주세요.');
+				return;
+			}
+
+			var btnNextStep = iframeDocument.getElementsByClassName('btn_next_step');
+			btnNextStep[0].click();
+
+		}
+
+		payment_process()
+
+	}
+	else
+	{
+		console.log('select seat process');
+		document.getElementById('ifrmSeat').onload = function() {
+			var iframe = document.getElementById('ifrmSeat');
+			var iframeDocument = iframe.contentWindow.document;
+			var seatAvailable = iframeDocument.querySelectorAll('img.stySeat');
+
+			if (seatAvailable.length)
+			{
+				seatAvailable[0].click();
+			}
+			var btnNextStep = iframeDocument.getElementsByClassName('btn_next_step');
+			console.log('seat click');
+			btnNextStep[0].click();
+		}
+
+		payment_process()
 	}
 }
 

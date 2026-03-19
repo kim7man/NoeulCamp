@@ -10,6 +10,11 @@ function pad (str, max) {
   return str.length < max ? pad("0" + str, max) : str;
 }
 
+const clearCaptchaLayer() {
+	$('div.captchSliderLayer')[0].style="display:none;";
+	$('div#divRecaptchaWrap')[0].style="display:none;";
+	$('div#divRecaptcha')[0].style="display:none;";
+}
 
 
 window.showModalDialog = window.showModalDialog || function(url, arg, opt) {
@@ -101,6 +106,7 @@ function inject_header()
 	if (btnstart) {
 		btnstart.addEventListener("click", macrostart, false);
 	}
+
 }
 
 if (document.URL.substring(0, dsturl_Cal.length) == dsturl_Cal) {
